@@ -1,0 +1,18 @@
+---
+- name: include distribution specific variables
+  include_vars:
+    file: "{{ item }}"
+  vars:
+    var_files:
+      files:
+        - "{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      paths:
+        - 'vars'
+  loop: "{{ q('first_found', var_files, errors='ignore') }}"
+
+- name: include daemontools specificc
+  include_vars:
+    file: daemontools.yml
+  when: has_daemontools

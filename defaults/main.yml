@@ -1,2 +1,22 @@
 ---
-# defaults file for ansible_role_sshguard
+want_sshguard: false
+
+root_group: root
+
+has_daemontools: false
+services_dir: /services
+daemontools_svscan_dir: "{{ services_dir }}/svscan"
+
+sshguard_packages:
+  - sshguard
+sshguard_service: sshguard
+sshguard_dir: /etc
+sshguard_conf_dir: /etc
+sshguard_conf_file: sshguard.conf
+sshguard_threshold: 30
+sshguard_block_time: 600
+sshguard_detection_time: 7200
+sshguard_backend: /usr/local/libexec/sshg-fw-pf
+sshguard_dirs: []
+sshguard_run_dir: /var/run
+sshguard_db_dir: /var/db/sshguard

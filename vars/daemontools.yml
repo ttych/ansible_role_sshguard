@@ -1,0 +1,5 @@
+sshguard_dir: "{{ services_dir }}/sshguard"
+sshguard_conf_alt_dir: "{{ sshguard_dir }}/etc"
+sshguard_run_dir: "{{ sshguard_dir }}/run"
+sshguard_db_dir: "{{ sshguard_dir }}/db"
+sshguard_svscan_dir: "{{ sshguard_dir }}/svscan"

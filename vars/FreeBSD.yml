@@ -1,0 +1,5 @@
+---
+root_group: wheel
+
+sshguard_dir: /usr/local/etc
+sshguard_conf_dir: /usr/local/etc
