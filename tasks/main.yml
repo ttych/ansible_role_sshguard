@@ -1,10 +1,12 @@
 ---
-- block:
+
+- name: sshguard
+  when: want_sshguard
+  block:
     - include_tasks: context.yml
 
-    - include_tasks: configure.yml
+    - include_tasks: sshguard.yml
 
-  when: want_sshguard
 
 - name: set has_sshguard
   set_fact:

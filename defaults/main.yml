@@ -1,22 +1,47 @@
 ---
+
 want_sshguard: false
 
-root_group: root
-
-has_daemontools: false
-services_dir: /services
-daemontools_svscan_dir: "{{ services_dir }}/svscan"
 
 sshguard_packages:
   - sshguard
-sshguard_service: sshguard
-sshguard_dir: /etc
-sshguard_conf_dir: /etc
-sshguard_conf_file: sshguard.conf
-sshguard_threshold: 30
-sshguard_block_time: 600
-sshguard_detection_time: 7200
-sshguard_backend: /usr/local/libexec/sshg-fw-pf
-sshguard_dirs: []
-sshguard_run_dir: /var/run
-sshguard_db_dir: /var/db/sshguard
+
+sshguard_conf_dir: /etc/sshguard
+sshguard_conf: "{{ sshguard_conf_dir }}/sshguard.conf"
+sshguard_conf_whitelist: "{{ sshguard_conf_dir }}/whitelist"
+sshguard_files:
+  - path: "{{ sshguard_conf_dir }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0750"
+  - path: "{{ sshguard_conf }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0640"
+    state: file
+  - path: "{{ sshguard_conf_whitelist }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: "0640"
+    state: file
+
+sshguard_settings:
+  - name: THRESHOLD
+    value: 100
+  - name: BLOCK_TIME
+    value: 1800
+  - name: DETECTION_TIME
+    value: 43200
+  - name: WHITELIST_FILE
+    value: "{{ sshguard_conf_whitelist }}"
+
+sshguard_whitelist:
+  - '127.0.0.1'
+  - '::1'
+# sshguard_whitelist: "{{ (['127.0.0.1', '::1'] + ansible_facts.all_ipv4_addresses + ansible_facts.all_ipv6_addresses) | unique }}"
+
+sshguard_service_name: sshguard
+
+
+
+root_group: root

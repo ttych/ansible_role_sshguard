@@ -1,0 +1,70 @@
+---
+
+- name: install sshguard package
+  ansible.builtin.package:
+    name: "{{ sshguard_package }}"
+    state: present
+  register: t_sshguard_package
+
+
+
+- name: ensure conf permissions
+  ansible.builtin.file:
+    path: "{{ item.path | d(omit) }}"
+    owner: "{{ item.owner | d(omit) }}"
+    group: "{{ item.group | d(omit) }}"
+    mode: "{{ item.mode | d(omit) }}"
+    state: "{{ item.state|d('directory') }}"
+  loop: "{{ sshguard_files }}"
+
+
+- name: configure sshguard
+  ansible.builtin.lineinfile:
+    path: "{{ sshguard_conf }}"
+    regexp: "^{{ sshguard_setting.name }}="
+    line: "{{ sshguard_setting.name }}={{ sshguard_setting.value }}"
+    state: "{{ sshguard_setting.state | d('present') }}"
+    backrefs: "{{ sshguard_setting.backrefs | d(false) }}"
+    insertafter: "{{ sshguard_setting.insertafter | d('^#\\s*' + sshguard_setting.name + '=') }}"
+    create: yes
+  when:
+    - sshguard_setting.when | d(true)
+    - sshguard_setting.value not in [none, '']
+  loop: "{{ sshguard_settings }}"
+  loop_control:
+    loop_var: sshguard_setting
+  register: t_sshguard_settings
+
+- name: configure whitelist
+  ansible.builtin.lineinfile:
+    path: "{{ sshguard_conf_whitelist }}"
+    regexp: "^{{ sshguard_whitelist_item }}"
+    line: "{{ sshguard_whitelist_item }}"
+    create: yes
+  when:
+    - sshguard_whitelist_item not in [none, '']
+  loop: "{{ sshguard_whitelist }}"
+  loop_control:
+    loop_var: sshguard_whitelist_item
+  register: t_sshguard_whitelist
+
+
+
+- name: enable sshguard service
+  ansible.builtin.service:
+    name: "{{ sshguard_service_name }}"
+    enabled: yes
+
+- name: start sshguard service
+  ansible.builtin.service:
+    name: "{{ sshguard_service_name }}"
+    state: started
+  register: t_sshguard_service_start
+
+- name: restart sshguard service on change
+  ansible.builtin.service:
+    name: "{{ sshguard_service_name }}"
+    state: restarted
+  when:
+    - not t_sshguard_service_start.changed
+    - t_sshguard_settings.changed or t_sshguard_whitelist.changed
