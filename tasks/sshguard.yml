@@ -1,10 +1,10 @@
 ---
 
-- name: install sshguard package
+- name: install sshguard packages
   ansible.builtin.package:
-    name: "{{ sshguard_package }}"
+    name: "{{ sshguard_packages }}"
     state: present
-  register: t_sshguard_package
+  register: t_sshguard_packages
 
 
 
@@ -67,4 +67,4 @@
     state: restarted
   when:
     - not t_sshguard_service_start.changed
-    - t_sshguard_settings.changed or t_sshguard_whitelist.changed
+    - t_sshguard_packages.changed or t_sshguard_settings.changed or t_sshguard_whitelist.changed
